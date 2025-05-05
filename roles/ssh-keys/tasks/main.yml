@@ -1,0 +1,44 @@
+---
+# roles/ssh-keys/tasks/main.yml
+- name: Ensure .ssh directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.ssh"
+    state: directory
+    mode: '0700'
+
+- name: Configure SSH keys from environment variables
+  authorized_key:
+    user: "{{ ansible_user }}"
+    key: "{{ item }}"
+    state: present
+  loop: "{{ ssh_public_keys }}"
+  when: ssh_public_keys is defined
+
+- name: Configure SSH keys from vault
+  authorized_key:
+    user: "{{ ansible_user }}"
+    key: "{{ item.key }}"
+    comment: "{{ item.username }}"
+    state: present
+  loop: "{{ vault_ssh_users }}"
+  when: vault_ssh_users is defined
+
+- name: Configure SSH daemon for key-only auth
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+  loop:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+    - { regexp: '^#?AuthorizedKeysFile', line: 'AuthorizedKeysFile .ssh/authorized_keys' }
+  become: yes
+  notify: restart sshd
+
+- name: Set strict permissions on SSH config
+  file:
+    path: /etc/ssh/sshd_config
+    mode: '0644'
+  become: yes

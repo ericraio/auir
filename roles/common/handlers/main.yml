@@ -1,0 +1,17 @@
+---
+# roles/common/handlers/main.yml
+- name: restart syslog
+  command: launchctl restart com.apple.syslogd
+  become: yes
+
+- name: reload system services
+  command: launchctl reboot userspace
+  become: yes
+
+- name: flush dns cache
+  command: dscacheutil -flushcache
+  become: yes
+
+- name: restart network
+  command: dscacheutil -flushcache && killall -HUP mDNSResponder
+  become: yes

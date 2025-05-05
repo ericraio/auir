@@ -1,0 +1,29 @@
+---
+# roles/monitoring/defaults/main.yml
+prometheus_version: "2.40.0"
+grafana_version: "9.3.0"
+node_exporter_version: "1.5.0"
+
+prometheus_port: 9090
+grafana_port: 3000
+node_exporter_port: 9100
+
+prometheus_retention: "30d"
+prometheus_scrape_interval: "15s"
+prometheus_evaluation_interval: "15s"
+
+grafana_admin_user: "admin"
+grafana_admin_password: "admin"
+
+monitoring_targets:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+  
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['localhost:9323']

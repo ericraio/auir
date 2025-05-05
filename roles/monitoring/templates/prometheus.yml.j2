@@ -1,0 +1,20 @@
+global:
+  scrape_interval: {{ prometheus_scrape_interval }}
+  evaluation_interval: {{ prometheus_evaluation_interval }}
+  external_labels:
+    monitor: 'mac-mini-monitor'
+
+scrape_configs:
+{% for target in monitoring_targets %}
+  - job_name: '{{ target.job_name }}'
+    static_configs:
+      - targets: {{ target.static_configs[0].targets | to_json }}
+{% endfor %}
+
+rule_files:
+  - "/opt/prometheus/rules/*.rules"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []

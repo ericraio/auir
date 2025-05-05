@@ -1,0 +1,27 @@
+---
+# roles/docker/defaults/main.yml
+docker_edition: 'ce'
+docker_package: "docker-{{ docker_edition }}"
+
+docker_storage_driver: "overlay2"
+docker_log_driver: "json-file"
+docker_log_opts:
+  max-size: "10m"
+  max-file: "3"
+
+docker_containers:
+  - name: nginx-proxy
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/etc/nginx:/etc/nginx:ro"
+  
+  - name: portainer
+    image: portainer/portainer-ce:latest
+    ports:
+      - "9000:9000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "portainer_data:/data"

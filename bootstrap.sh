@@ -104,6 +104,23 @@ clone_repository() {
     fi
 }
 
+# Function to setup SSH Key management
+create_ssh_keys() {
+  # Create SSH key management
+  if [ ! -f "~/.ssh/mac-mini-keys.pub" ]; then
+      echo "Generating SSH key for Mac Mini..."
+      ssh-keygen -t ed25519 -f ~/.ssh/mac-mini-keys -N "" -C "mac-mini-server"
+      
+      echo "Add this public key to the Mac Mini:"
+      cat ~/.ssh/mac-mini-keys.pub
+      read -p "Press Enter when done..."
+  fi
+
+  # Copy SSH key to authorized_keys
+  echo "Configuring SSH access..."
+  ssh-copy-id -i ~/.ssh/mac-mini-keys.pub "$MAC_MINI_USER@$MAC_MINI_IP"
+}
+
 # Function to create inventory file if it doesn't exist
 create_inventory() {
     if [ ! -f "$PROJECT_DIR/inventory/hosts" ]; then
@@ -216,7 +233,10 @@ main() {
     
     # Clone repository
     clone_repository
-    
+
+    # Create SSH Keys
+    create_ssh_keys
+ 
     # Create inventory if needed
     create_inventory
     

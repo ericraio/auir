@@ -15,6 +15,27 @@
 # MacOS
 .DS_Store
 
-# Secrets
+# Secrets and Keys - NEVER commit these!
+files/ssh/authorized_keys
+files/ssh/*.pem
+files/ssh/*.key
+files/ssl/*.pem
+files/ssl/*.key
+files/ssl/*.crt
 secrets/
-private_keys/
+group_vars/vault.yml
+host_vars/secrets.yml
+**/vault.yml
+**/*.pem
+**/*.key
+**/*.crt
+ansible-vault-password*
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Local overrides
+local.yml
+override.yml

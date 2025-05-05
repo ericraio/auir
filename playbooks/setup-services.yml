@@ -1,0 +1,50 @@
+---
+# playbooks/setup-services.yml
+- name: Configure Services
+  hosts: mac_mini
+  become: yes
+  
+  tasks:
+    - name: Install Docker
+      include_role:
+        name: docker
+      
+    - name: Setup monitoring stack
+      include_role:
+        name: monitoring
+      
+    - name: Configure reverse proxy
+      include_role:
+        name: reverse-proxy
+      
+    - name: Setup backup system
+      include_role:
+        name: backup
+    
+    - name: Create service launchers
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      loop:
+        - src: services/docker.plist.j2
+          dest: /Library/LaunchDaemons/com.docker.docker.plist
+        - src: services/prometheus.plist.j2
+          dest: /Library/LaunchDaemons/com.prometheus.plist
+        - src: services/grafana.plist.j2
+          dest: /Library/LaunchDaemons/com.grafana.plist
+      notify: reload launchd
+    
+    - name: Start services
+      launchd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - com.docker.docker
+        - com.prometheus
+        - com.grafana
+  
+  handlers:
+    - name: reload launchd
+      command: launchctl reload

@@ -1,0 +1,49 @@
+---
+# playbooks/setup-security.yml
+- name: Configure Security Settings
+  hosts: mac_mini
+  become: yes
+  
+  tasks:
+    - name: Enable firewall
+      command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+      register: firewall_result
+      changed_when: "'already enabled' not in firewall_result.stdout"
+    
+    - name: Set firewall to stealth mode
+      command: /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+      register: stealth_result
+      changed_when: "'already enabled' not in stealth_result.stdout"
+    
+    - name: Configure automatic updates
+      osx_defaults:
+        domain: /Library/Preferences/com.apple.SoftwareUpdate
+        key: "{{ item.key }}"
+        type: "{{ item.type }}"
+        value: "{{ item.value }}"
+      loop:
+        - { key: "AutomaticDownload", type: "bool", value: true }
+        - { key: "AutomaticCheckEnabled", type: "bool", value: true }
+        - { key: "ConfigDataInstall", type: "bool", value: true }
+        - { key: "CriticalUpdateInstall", type: "bool", value: true }
+    
+    - name: Configure secure authentication
+      include_tasks: tasks/configure-auth.yml
+    
+    - name: Install fail2ban via Homebrew
+      homebrew:
+        name: fail2ban
+        state: present
+      become: no
+    
+    - name: Configure fail2ban jail.local
+      template:
+        src: security/jail.local.j2
+        dest: /etc/fail2ban/jail.local
+        mode: '0644'
+      notify: restart fail2ban
+  
+  handlers:
+    - name: restart fail2ban
+      command: brew services restart fail2ban
+      become: no

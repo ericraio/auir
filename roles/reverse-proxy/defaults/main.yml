@@ -1,0 +1,21 @@
+---
+# roles/reverse-proxy/defaults/main.yml
+use_nginx: true
+use_traefik: false
+
+nginx_worker_processes: auto
+nginx_worker_connections: 1024
+
+ssl_certificate: "/opt/nginx/ssl/cert.pem"
+ssl_certificate_key: "/opt/nginx/ssl/key.pem"
+
+reverse_proxy_services:
+  - name: grafana
+    port: 3000
+    ssl: false
+  - name: prometheus
+    port: 9090
+    ssl: false
+  - name: homeassistant
+    port: 8123
+    ssl: true

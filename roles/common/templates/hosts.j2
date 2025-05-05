@@ -1,0 +1,11 @@
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost
+
+# Mac Mini Server
+{{ static_ip | default(ansible_default_ipv4.address) }}	{{ hostname }}.{{ domain_name }} {{ hostname }}
+
+# Service endpoints
+{% for service in services %}
+{{ service.ip | default('127.0.0.1') }}	{{ service.name }}.{{ domain_name }}
+{% endfor %}

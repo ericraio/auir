@@ -1,0 +1,26 @@
+---
+# roles/common/defaults/main.yml
+time_zone: "America/Los_Angeles"
+
+ntp_servers:
+  - "time.apple.com"
+  - "pool.ntp.org"
+
+common_packages:
+  - git
+  - wget
+  - curl
+  - htop
+  - tree
+  - neofetch
+  - jq
+  - tmux
+  - vim
+
+system_limits:
+  files:
+    soft: 65536
+    hard: 200000
+  proc:
+    soft: 2048
+    hard: 4096

@@ -1,0 +1,6 @@
+---
+# roles/ssh-keys/handlers/main.yml
+- name: restart sshd
+  command: launchctl kickstart -kp system/com.openssh.sshd
+  become: yes
+  listen: restart sshd

@@ -1,0 +1,58 @@
+---
+# roles/reverse-proxy/tasks/main.yml
+- name: Install nginx via Homebrew
+  homebrew:
+    name: nginx
+    state: present
+  become: no
+
+- name: Create nginx directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/nginx/conf.d
+    - /opt/nginx/ssl
+    - /opt/nginx/logs
+
+- name: Configure nginx
+  template:
+    src: nginx.conf.j2
+    dest: /opt/nginx/nginx.conf
+    mode: '0644'
+  notify: reload nginx
+
+- name: Create nginx vhost configs
+  template:
+    src: "{{ item }}"
+    dest: "/opt/nginx/conf.d/{{ item | basename | regex_replace('.j2$', '') }}"
+    mode: '0644'
+  with_fileglob:
+    - "{{ role_path }}/templates/vhosts/*.j2"
+  notify: reload nginx
+
+- name: Start nginx service
+  launchd:
+    name: org.nginx.nginx
+    state: started
+    enabled: yes
+
+- name: Configure Traefik container
+  docker_container:
+    name: traefik
+    image: traefik:v2.9
+    restart_policy: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/opt/traefik:/etc/traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+  when: use_traefik | default(false)

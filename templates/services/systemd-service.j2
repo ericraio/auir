@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>{{ service_name }}</string>
+    <key>ProgramArguments</key>
+    <array>
+{% for arg in service_args %}
+        <string>{{ arg }}</string>
+{% endfor %}
+    </array>
+    <key>KeepAlive</key>
+    <true/>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/var/log/{{ service_name }}.log</string>
+    <key>StandardErrorPath</key>
+    <string>/var/log/{{ service_name }}.error.log</string>
+    <key>WorkingDirectory</key>
+    <string>{{ working_directory }}</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+{% for key, value in environment_vars.items() %}
+        <key>{{ key }}</key>
+        <string>{{ value }}</string>
+{% endfor %}
+    </dict>
+</dict>
+</plist>

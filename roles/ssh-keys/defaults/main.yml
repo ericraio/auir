@@ -1,0 +1,16 @@
+---
+# roles/ssh-keys/defaults/main.yml
+# Extract SSH keys from environment variables
+ssh_public_keys:
+  - "{{ lookup('env', 'ADMIN_SSH_KEY') | default('') }}"
+  - "{{ lookup('env', 'DEPLOY_SSH_KEY') | default('') }}"
+
+# Filter out empty keys
+ssh_public_keys: "{{ ssh_public_keys | select() | list }}"
+
+# SSH configuration options
+ssh_port: 22
+ssh_allow_users: 
+  - "{{ ansible_user }}"
+  - admin
+  - deploy

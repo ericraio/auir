@@ -10,6 +10,7 @@
       become: no
       
   roles:
+    - ssh-keys
     - macos-defaults
     - common
     - homebrew

@@ -1,6 +1,6 @@
 ---
 # Default variables for macOS configuration
-computer_name: "mac-mini-homeserver"
+computer_name: "auir"
 timezone: "America/Los_Angeles"
 network_interface: "en0"
 

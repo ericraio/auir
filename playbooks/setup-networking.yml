@@ -1,0 +1,40 @@
+---
+# playbooks/setup-networking.yml
+- name: Configure Network Settings
+  hosts: mac_mini
+  become: yes
+  
+  tasks:
+    - name: Configure static IP if defined
+      include_tasks: tasks/configure-static-ip.yml
+      when: static_ip is defined
+    
+    - name: Set DNS servers
+      command: networksetup -setdnsservers "{{ network_interface }}" {{ dns_servers | join(' ') }}
+      register: dns_result
+      changed_when: false
+    
+    - name: Configure Wake on LAN
+      command: pmset -a womp 1
+      register: wol_result
+      changed_when: false
+    
+    - name: Enable remote login
+      command: systemsetup -setremotelogin on
+      register: remote_login_result
+      changed_when: "'already' not in remote_login_result.stdout"
+    
+    - name: Configure network hostname
+      command: "scutil --set HostName {{ hostname }}"
+      when: hostname is defined
+      
+    - name: Configure IPv6
+      command: networksetup -setv6automatic "{{ network_interface }}"
+      register: ipv6_result
+      changed_when: false
+    
+    - name: Disable Wi-Fi if using Ethernet
+      command: networksetup -setairportpower en0 off
+      when: disable_wifi | default(false)
+      register: wifi_result
+      changed_when: false

@@ -1,0 +1,25 @@
+---
+# roles/backup/defaults/main.yml
+backup_destination: "/Volumes/Backup"
+backup_include_dirs:
+  - "/Users"
+  - "/opt"
+  - "/etc"
+  - "/Applications"
+
+backup_exclude_dirs:
+  - ".git"
+  - ".Trash"
+  - "node_modules"
+  - ".cache"
+
+backup_schedule:
+  - name: "Daily Backup"
+    minute: "0"
+    hour: "2"
+    weekday: "*"
+  
+  - name: "Weekly Full Backup"  
+    minute: "0"
+    hour: "3"
+    weekday: "0"

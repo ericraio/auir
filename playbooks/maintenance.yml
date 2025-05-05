@@ -1,0 +1,54 @@
+---
+# playbooks/maintenance.yml
+- name: System Maintenance Tasks
+  hosts: mac_mini
+  become: yes
+  
+  tasks:
+    - name: Clean Homebrew cache
+      command: brew cleanup
+      become: no
+      register: brew_cleanup
+      changed_when: false
+    
+    - name: Update Homebrew packages
+      homebrew:
+        update_homebrew: yes
+        upgrade_all: yes
+      become: no
+    
+    - name: Clean Docker images
+      command: docker system prune -af
+      register: docker_clean
+      changed_when: false
+    
+    - name: Check disk space
+      command: df -h
+      register: disk_space
+      changed_when: false
+    
+    - name: Clean system caches
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /Library/Caches
+        - ~/Library/Caches
+      ignore_errors: yes
+    
+    - name: Rotate logs
+      command: newsyslog -F
+      register: log_rotation
+      changed_when: false
+    
+    - name: Update system
+      command: softwareupdate -i -a
+      register: system_update
+      changed_when: false
+    
+    - name: Display system status
+      debug:
+        msg:
+          - "Disk space: {{ disk_space.stdout }}"
+          - "Docker cleanup: {{ docker_clean.stdout }}"
+          - "System update: {{ system_update.stdout }}"

@@ -1,0 +1,26 @@
+---
+# playbooks/setup-macos-defaults.yml
+- name: Configure macOS System Defaults
+  hosts: mac_mini
+  become: yes
+  vars:
+    confirm_defaults: "yes"
+  
+  pre_tasks:
+    - name: Create backup of current defaults
+      command: defaults read > ~/Library/Preferences/defaults-backup-{{ ansible_date_time.epoch }}.plist
+      delegate_to: localhost
+      run_once: true
+      become: no
+      changed_when: false
+
+  roles:
+    - macos-defaults
+  
+  post_tasks:
+    - name: Display summary
+      debug:
+        msg:
+          - "macOS defaults configuration complete!"
+          - "Backup saved to: ~/Library/Preferences/defaults-backup-{{ ansible_date_time.epoch }}.plist"
+          - "Some changes may require a restart to take effect."

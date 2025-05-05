@@ -1,0 +1,54 @@
+---
+# roles/common/tasks/main.yml
+- name: Set timezone
+  timezone:
+    name: "{{ time_zone }}"
+  become: yes
+
+- name: Install common system packages
+  homebrew:
+    name: "{{ common_packages }}"
+    state: present
+  become: no
+
+- name: Create common directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/scripts
+    - /opt/logs
+    - /opt/data
+    - /opt/configs
+
+- name: Configure NTP servers
+  command: "systemsetup -setnetworktimeserver {{ ntp_servers | join(' ') }}"
+  become: yes
+  register: ntp_result
+  changed_when: false
+
+- name: Copy custom scripts
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/scripts/"
+    mode: '0755'
+  with_fileglob:
+    - "files/scripts/*"
+
+- name: Configure system limits
+  lineinfile:
+    path: /etc/launchd.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "limit maxfiles 65536 200000"
+    - "limit maxproc 2048 4096"
+  become: yes
+
+- name: Set up logging
+  lineinfile:
+    path: /etc/newsyslog.conf
+    line: "/var/log/homeserver.log 644 7 * @T00 J"
+    create: yes
+  become: yes
