@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 REPO_URL="https://github.com/ericraio/auir.git"
 ANSIBLE_VERSION=">=8.0"
-PROJECT_DIR="$HOME/mac-mini-server"
+PROJECT_DIR="$HOME/auir"
 
 echo -e "${GREEN}=== Mac Mini Home Server Setup ===${NC}"
 echo ""
@@ -232,7 +232,7 @@ main() {
     #check_ssh_key
     
     # Clone repository
-    clone_repository
+    #clone_repository
 
     # Create SSH Keys
     #create_ssh_keys
