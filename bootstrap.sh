@@ -229,13 +229,13 @@ main() {
     install_ansible
     
     # Setup SSH
-    check_ssh_key
+    #check_ssh_key
     
     # Clone repository
     clone_repository
 
     # Create SSH Keys
-    create_ssh_keys
+    #create_ssh_keys
  
     # Create inventory if needed
     create_inventory
