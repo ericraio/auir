@@ -10,14 +10,14 @@
       become: no
       
   roles:
-    - ssh-keys
-    - macos-defaults
-    - common
-    - homebrew
-    - docker
-    - reverse-proxy
-    - monitoring
-    - backup
+    #- ../roles/ssh-keys
+    #- ../roles/macos-defaults
+    - ../roles/common
+    - ../roles/homebrew
+    - ../roles/docker
+    - ../roles/reverse-proxy
+    - ../roles/monitoring
+    - ../roles/backup
 
   post_tasks:
     - name: Configure system settings
