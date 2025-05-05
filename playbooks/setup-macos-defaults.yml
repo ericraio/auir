@@ -15,7 +15,7 @@
       changed_when: false
 
   roles:
-    - macos-defaults
+    - ../roles/macos-defaults
   
   post_tasks:
     - name: Display summary
