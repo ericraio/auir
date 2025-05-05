@@ -1,0 +1,34 @@
+---
+- name: Configure Mac Mini Home Server
+  hosts: mac_mini
+  become: yes
+  
+  pre_tasks:
+    - name: Update Homebrew cache
+      community.general.homebrew:
+        update_homebrew: yes
+      become: no
+      
+  roles:
+    - macos-defaults
+    - common
+    - homebrew
+    - docker
+    - reverse-proxy
+    - monitoring
+    - backup
+
+  post_tasks:
+    - name: Configure system settings
+      block:
+        - name: Set computer name
+          command: "scutil --set ComputerName {{ hostname }}"
+          
+        - name: Set hostname
+          command: "scutil --set HostName {{ hostname }}"
+          
+        - name: Set local hostname
+          command: "scutil --set LocalHostName {{ hostname }}"
+      
+    - name: Ensure all services are running
+      meta: flush_handlers

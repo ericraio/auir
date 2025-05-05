@@ -1,0 +1,45 @@
+---
+- name: Create monitoring directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/prometheus
+    - /opt/grafana
+
+- name: Configure Prometheus
+  template:
+    src: prometheus.yml.j2
+    dest: /opt/prometheus/prometheus.yml
+    mode: '0644'
+  notify: restart prometheus
+
+- name: Configure Grafana
+  template:
+    src: grafana-config.yml.j2
+    dest: /opt/grafana/config.yml
+    mode: '0644'
+  notify: restart grafana
+
+- name: Start monitoring services
+  docker_container:
+    name: "{{ item.name }}"
+    image: "{{ item.image }}"
+    ports: "{{ item.ports }}"
+    volumes: "{{ item.volumes }}"
+    restart_policy: always
+    state: started
+  loop:
+    - name: prometheus
+      image: prom/prometheus:latest
+      ports:
+        - "{{ prometheus_port }}:9090"
+      volumes:
+        - "/opt/prometheus:/etc/prometheus:ro"
+    - name: grafana
+      image: grafana/grafana:latest
+      ports:
+        - "{{ grafana_port }}:3000"
+      volumes:
+        - "/opt/grafana:/etc/grafana"

@@ -1,0 +1,28 @@
+---
+- name: Create backup directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ backup_destination }}"
+    - /opt/backup-scripts
+
+- name: Copy backup script
+  copy:
+    src: backup-script.sh
+    dest: /opt/backup-scripts/backup.sh
+    mode: '0755'
+
+- name: Configure Time Machine
+  command: |
+    tmutil setdestination "{{ backup_destination }}"
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: Add cron job for backups
+  cron:
+    name: "Daily backup"
+    minute: "0"
+    hour: "2"
+    job: "/opt/backup-scripts/backup.sh"
+    user: root

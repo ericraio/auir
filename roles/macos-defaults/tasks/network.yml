@@ -1,0 +1,57 @@
+---
+# Network optimizations for server
+- name: Configure network sharing
+  block:
+    - name: Enable remote login (SSH)
+      command: systemsetup -setremotelogin on
+      become: yes
+      register: remote_login_result
+      changed_when: "'already' not in remote_login_result.stdout"
+
+    - name: Enable remote management
+      command: systemsetup -setremoteappleevents on
+      become: yes
+      register: remote_mgmt_result
+      changed_when: "'already' not in remote_mgmt_result.stdout"
+
+- name: Configure network power settings
+  osx_defaults:
+    domain: com.apple.PowerManagement
+    key: SystemPowerSettings
+    type: dict
+    value:
+      Wake\ On\ LAN: 1
+      Wake\ On\ AC\ Change: 1
+  become: yes
+
+- name: Disable mDNSResponder logging
+  osx_defaults:
+    domain: /Library/Preferences/com.apple.mDNSResponder
+    key: NoMulticastAdvertisements
+    type: bool
+    value: true
+  become: yes
+
+- name: Configure DNS settings
+  community.general.dconf:
+    key: "/system/proxy/http/enabled"
+    value: "false"
+  become: yes
+
+- name: Enable TCP Fast Open
+  command: sysctl -w net.inet.tcp.tfo_client_enable=1 net.inet.tcp.tfo_server_enable=1
+  become: yes
+  register: tcp_result
+  changed_when: false
+
+- name: Configure IPv6
+  command: networksetup -setv6automatic "{{ network_interface }}"
+  become: yes
+  register: ipv6_result
+  changed_when: false
+
+- name: Set DNS servers
+  command: networksetup -setdnsservers "{{ network_interface }}" {{ dns_servers | join(' ') }}
+  become: yes
+  register: dns_result
+  changed_when: false

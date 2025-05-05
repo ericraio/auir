@@ -1,0 +1,36 @@
+---
+# Global configuration
+time_zone: "America/Los_Angeles"
+ntp_servers:
+  - "time.apple.com"
+  - "pool.ntp.org"
+
+# Network settings
+domain_name: "homelab.local"
+dns_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+# Security settings
+ssh_port: 22
+ssh_allowed_users:
+  - admin
+  - service_user
+
+fail2ban_enabled: true
+ufw_enabled: true
+
+# Common packages
+common_packages:
+  - git
+  - wget
+  - curl
+  - htop
+  - neofetch
+  
+# Backup settings
+backup_destination: "/Volumes/Backup"
+backup_include_dirs:
+  - "/Users"
+  - "/Applications"
+  - "/etc"

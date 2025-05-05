@@ -1,0 +1,72 @@
+---
+# Performance optimizations
+- name: Disable visual effects
+  osx_defaults:
+    domain: NSGlobalDomain
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop:
+    - { key: "NSUseAnimatedFocusRing", type: "bool", value: false }
+    - { key: "NSScrollAnimationEnabled", type: "bool", value: false }
+    - { key: "NSWindowResizeTime", type: "float", value: 0.001 }
+    - { key: "InitialKeyRepeat", type: "int", value: 15 }
+    - { key: "KeyRepeat", type: "int", value: 2 }
+  become: yes
+
+- name: Increase memory limits
+  block:
+    - name: Configure kernel parameters
+      command: "sysctl -w {{ item }}"
+      loop:
+        - "kern.maxfiles=20480"
+        - "kern.maxfilesperproc=18000"
+        - "net.inet.ip.maxfragpackets=1024"
+      become: yes
+      register: sysctl_result
+      changed_when: false
+
+    - name: Disable swap usage hints
+      command: sysctl -w vm.swapusage=0
+      become: yes
+      register: swap_result
+      changed_when: false
+
+- name: Configure system resource limits
+  lineinfile:
+    path: /etc/launchd.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "limit maxfiles 65536 200000"
+    - "limit maxproc 2048 4096"
+  become: yes
+
+- name: Disable Spotlight indexing for mounted volumes
+  command: mdutil -i off "{{ item }}"
+  loop:
+    - /Volumes
+  become: yes
+  register: spotlight_result
+  failed_when: false
+  changed_when: false
+
+- name: Configure disk cache
+  command: "sysctl -w {{ item }}"
+  loop:
+    - "vfs.generic.vnnode_count=20000"
+    - "vfs.generic.namesize=64"
+  become: yes
+  register: cache_result
+  changed_when: false
+
+- name: Disable Time Machine on all volumes except backup drive
+  command: tmutil addexclusion "{{ item }}"
+  loop:
+    - /System/Volumes/Data
+    - /private/var
+    - /tmp
+  become: yes
+  register: timemachine_result
+  failed_when: false
+  changed_when: false

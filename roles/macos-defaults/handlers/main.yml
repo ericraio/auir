@@ -1,0 +1,25 @@
+---
+- name: killall Dock
+  command: killall Dock
+  ignore_errors: yes
+  become: yes
+
+- name: killall Finder
+  command: killall Finder
+  ignore_errors: yes
+  become: yes
+
+- name: killall SystemUIServer
+  command: killall SystemUIServer
+  ignore_errors: yes
+  become: yes
+
+- name: restart networking
+  command: dscacheutil -flushcache && killall -HUP mDNSResponder
+  become: yes
+  ignore_errors: yes
+
+- name: restart thermal
+  command: launchctl restart com.apple.thermald
+  become: yes
+  ignore_errors: yes

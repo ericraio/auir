@@ -1,0 +1,31 @@
+---
+hostname: "auir"
+network_interface: "en0"
+
+# Static IP configuration
+static_ip: "192.168.1.10"
+subnet_mask: "255.255.255.0"
+gateway: "192.168.1.1"
+
+# Services to run
+docker_enabled: true
+docker_containers:
+  - name: nginx-proxy
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/etc/nginx:/etc/nginx:ro"
+  
+  - name: home-assistant
+    image: homeassistant/home-assistant:latest
+    ports:
+      - "8123:8123"
+    volumes:
+      - "/opt/homeassistant/config:/config"
+
+# Monitoring
+monitoring_enabled: true
+prometheus_port: 9090
+grafana_port: 3000

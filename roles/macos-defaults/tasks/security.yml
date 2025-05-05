@@ -1,0 +1,67 @@
+---
+# Security settings for server
+- name: Enable firewall
+  command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+  become: yes
+  register: firewall_result
+  changed_when: "'already enabled' not in firewall_result.stdout"
+
+- name: Set firewall to stealth mode
+  command: /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+  become: yes
+  register: stealth_result
+  changed_when: "'already enabled' not in stealth_result.stdout"
+
+- name: Enable logging for firewall
+  command: /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
+  become: yes
+  register: logging_result
+  changed_when: "'already enabled' not in logging_result.stdout"
+
+- name: Configure automatic updates
+  osx_defaults:
+    domain: /Library/Preferences/com.apple.SoftwareUpdate
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop:
+    - { key: "AutomaticDownload", type: "bool", value: true }
+    - { key: "AutomaticCheckEnabled", type: "bool", value: true }
+    - { key: "ConfigDataInstall", type: "bool", value: true }
+    - { key: "CriticalUpdateInstall", type: "bool", value: true }
+  become: yes
+
+- name: Disable root account
+  command: dseditgroup -o edit -d root -t user admin
+  become: yes
+  register: root_result
+  failed_when: false
+  changed_when: false
+
+- name: Set secure keyboard entry in Terminal
+  osx_defaults:
+    domain: com.apple.Terminal
+    key: SecureKeyboardEntry
+    type: bool
+    value: true
+  become: yes
+
+- name: Configure login window settings
+  osx_defaults:
+    domain: com.apple.loginwindow
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop:
+    - { key: "AdminHostInfo", type: "string", value: "HostName" }
+    - { key: "ShowFullName", type: "bool", value: false }
+    - { key: "SHOWFULLNAME", type: "bool", value: false }
+    - { key: "HideLocalUsers", type: "bool", value: false }
+    - { key: "DisableConsoleAccess", type: "bool", value: true }
+  become: yes
+
+- name: Configure Gatekeeper
+  command: spctl --master-enable
+  become: yes
+  register: gatekeeper_result
+  changed_when: false

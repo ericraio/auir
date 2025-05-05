@@ -1,0 +1,41 @@
+---
+- name: Check if Homebrew is installed
+  stat:
+    path: /opt/homebrew/bin/brew
+  register: homebrew_check
+
+- name: Install Homebrew
+  raw: |
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not homebrew_check.stat.exists
+  become: no
+
+- name: Add Homebrew to PATH
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.zprofile"
+    line: 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+    create: yes
+  become: no
+
+- name: Install Homebrew packages
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker
+    - docker-compose
+    - nginx
+    - prometheus
+    - grafana
+    - node_exporter
+  become: no
+
+- name: Install Homebrew cask packages
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - alfred
+    - iterm2
+    - rectangle
+  become: no

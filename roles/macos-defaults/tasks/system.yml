@@ -1,0 +1,60 @@
+---
+# System-wide macOS defaults for server use
+- name: Set computer name
+  command: "scutil --set {{ item }} {{ computer_name }}"
+  loop:
+    - ComputerName
+    - HostName
+    - LocalHostName
+  become: yes
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+  become: yes
+
+- name: Configure system clock
+  osx_defaults:
+    domain: com.apple.menuextra.clock
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop:
+    - { key: "DateFormat", type: "string", value: "EEE h:mm a" }
+    - { key: "FlashDateSeparators", type: "bool", value: false }
+    - { key: "IsAnalog", type: "bool", value: false }
+  become: yes
+  notify: killall SystemUIServer
+
+- name: Disable automatic termination of inactive apps
+  osx_defaults:
+    domain: NSGlobalDomain
+    key: NSDisableAutomaticTermination
+    type: bool
+    value: true
+  become: yes
+
+- name: Configure crash reporter
+  osx_defaults:
+    domain: com.apple.CrashReporter
+    key: DialogType
+    type: string
+    value: "none"
+  become: yes
+
+- name: Disable dashboard
+  osx_defaults:
+    domain: com.apple.dashboard
+    key: mcx-disabled
+    type: bool
+    value: true
+  become: yes
+  notify: restart Dock
+
+- name: Set standby delay (4 hours)
+  command: pmset -a standbydelaylow 14400 standbydelayhigh 14400
+  become: yes
+
+- name: Disable sudden motion sensor (no moving parts)
+  command: pmset -a sms 0
+  become: yes

@@ -1,0 +1,36 @@
+---
+- name: Include system tasks
+  include_tasks: system.yml
+  tags:
+    - system
+    - macos
+
+- name: Include network tasks
+  include_tasks: network.yml
+  tags:
+    - network
+    - macos
+
+- name: Include power tasks
+  include_tasks: power.yml
+  tags:
+    - power
+    - macos
+
+- name: Include security tasks
+  include_tasks: security.yml
+  tags:
+    - security
+    - macos
+
+- name: Include finder tasks
+  include_tasks: finder.yml
+  tags:
+    - finder
+    - macos
+
+- name: Include performance tasks
+  include_tasks: performance.yml
+  tags:
+    - performance
+    - macos

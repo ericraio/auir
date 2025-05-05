@@ -1,0 +1,52 @@
+---
+# Power management optimized for server use
+- name: Configure power settings
+  command: "pmset -a {{ item }}"
+  loop:
+    - "sleep 0"           # Never sleep
+    - "displaysleep 10"   # Display sleep after 10 minutes
+    - "disksleep 0"       # Disk never sleeps
+    - "womp 1"            # Wake on LAN
+    - "powernap 0"        # Disable Power Nap
+    - "standby 0"         # Disable standby mode
+    - "hibernatemode 0"   # Disable hibernation
+    - "autopoweroff 0"    # Disable autopoweroff
+  become: yes
+  register: power_result
+  changed_when: false
+
+- name: Configure screen saver
+  osx_defaults:
+    domain: com.apple.screensaver
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop:
+    - { key: "moduleDict", type: "dict", value: { "moduleName": "Computer Name", "path": "/System/Library/Screen Savers/Computer Name.saver", "type": 1 } }
+    - { key: "idleTime", type: "int", value: 600 }
+  become: yes
+
+- name: Require password after sleep/screen saver
+  osx_defaults:
+    domain: com.apple.screensaver
+    key: askForPassword
+    type: bool
+    value: true
+  become: yes
+
+- name: Set password delay
+  osx_defaults:
+    domain: com.apple.screensaver
+    key: askForPasswordDelay
+    type: int
+    value: 0
+  become: yes
+
+- name: Disable energy saver preferences pane
+  osx_defaults:
+    domain: com.apple.systempreferences
+    key: DisabledPreferencePanes
+    type: array
+    value:
+      - com.apple.preference.energysaver
+  become: yes

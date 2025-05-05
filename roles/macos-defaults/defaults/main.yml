@@ -1,0 +1,40 @@
+---
+# Default variables for macOS configuration
+computer_name: "mac-mini-homeserver"
+timezone: "America/Los_Angeles"
+network_interface: "en0"
+
+# DNS settings
+dns_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+  - "1.1.1.1"
+
+# Power management
+power_management:
+  sleep: 0
+  disk_sleep: 0
+  display_sleep: 10
+  wake_on_lan: 1
+
+# Security settings
+security:
+  enable_firewall: true
+  enable_stealth_mode: true
+  require_password_after_sleep: true
+  password_delay: 0
+
+# Performance settings
+performance:
+  disable_visual_effects: true
+  optimize_for_server: true
+  max_files: 65536
+  max_proc: 4096
+
+# Finder settings
+finder:
+  show_hidden_files: true
+  show_all_extensions: true
+  show_path_bar: true
+  show_status_bar: true
+  disable_ds_store_network: true

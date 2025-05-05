@@ -1,0 +1,8 @@
+[mac_mini]
+mac-mac-01 ansible_host=192.18.1.10
+
+[mac_mini:vars]
+ansible_user=admin
+ansible_become=yes
+ansible_become_method=sudo
+ansible_python_interpreter=/usr/bin/python3

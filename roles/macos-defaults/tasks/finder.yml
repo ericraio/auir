@@ -1,0 +1,74 @@
+---
+# Finder settings optimized for server management
+- name: Show all filename extensions
+  osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleShowAllExtensions
+    type: bool
+    value: true
+  become: yes
+
+- name: Show hidden files
+  osx_defaults:
+    domain: com.apple.finder
+    key: AppleShowAllFiles
+    type: bool
+    value: true
+  become: yes
+  notify: killall Finder
+
+- name: Show status bar
+  osx_defaults:
+    domain: com.apple.finder
+    key: ShowStatusBar
+    type: bool
+    value: true
+  become: yes
+
+- name: Show path bar
+  osx_defaults:
+    domain: com.apple.finder
+    key: ShowPathbar
+    type: bool
+    value: true
+  become: yes
+
+- name: Display full POSIX path as Finder window title
+  osx_defaults:
+    domain: com.apple.finder
+    key: _FXShowPosixPathInTitle
+    type: bool
+    value: true
+  become: yes
+
+- name: Disable creation of .DS_Store files on network volumes
+  osx_defaults:
+    domain: com.apple.desktopservices
+    key: DSDontWriteNetworkStores
+    type: bool
+    value: true
+  become: yes
+
+- name: Disable creation of .DS_Store files on USB volumes
+  osx_defaults:
+    domain: com.apple.desktopservices
+    key: DSDontWriteUSBStores
+    type: bool
+    value: true
+  become: yes
+
+- name: Enable spring loading for directories
+  osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.springing.enabled
+    type: bool
+    value: true
+  become: yes
+
+- name: Remove spring loading delay
+  osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.springing.delay
+    type: float
+    value: 0
+  become: yes
