@@ -1,8 +1,2 @@
 [mac_mini]
 mac-mini-01 ansible_host=auir.local ansible_user=ericraio
-
-[mac_mini:vars]
-ansible_user=admin
-ansible_become=yes
-ansible_become_method=sudo
-ansible_python_interpreter=/usr/bin/python3
