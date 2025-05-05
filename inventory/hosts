@@ -1,5 +1,5 @@
 [mac_mini]
-mac-mac-01 ansible_host=192.18.1.10
+mac-mini-01 ansible_host=auir.local ansible_user=ericraio
 
 [mac_mini:vars]
 ansible_user=admin
