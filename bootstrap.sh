@@ -241,7 +241,7 @@ main() {
     create_inventory
     
     # Verify connectivity
-    verify_connectivity
+    # verify_connectivity
     
     # Install dependencies
     install_ansible_dependencies
