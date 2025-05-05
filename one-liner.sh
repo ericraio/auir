@@ -1,6 +1,6 @@
 #!/bin/bash
 # True one-liner Mac Mini setup - requires no user interaction
-# curl -fsSL https://raw.githubusercontent.com/your-username/mac-mini-server/main/one-liner.sh | bash -s -- <MAC_MINI_IP> <USERNAME> <PASSWORD>
+# curl -fsSL https://raw.githubusercontent.com/ericraio/auir/main/one-liner.sh | bash -s -- <MAC_MINI_IP> <USERNAME> <PASSWORD>
 
 set -e
 
@@ -33,8 +33,8 @@ brew install ansible git
 
 # Clone repository
 cd ~
-git clone --depth 1 https://github.com/your-username/mac-mini-server.git || cd mac-mini-server
-cd mac-mini-server
+git clone --depth 1 https://github.com/ericraio/auir.git || cd auir
+cd auir
 
 # Create inventory
 cat > inventory/hosts << EOF
